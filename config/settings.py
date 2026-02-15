@@ -19,6 +19,8 @@ INSTALLED_APPS = [
     # Third-party apps
     'rest_framework',
     'rest_framework.authtoken',
+    'drf_spectacular',
+    'drf_spectacular_sidecar',
     
     # Local apps
     'apps.accounts',
@@ -80,6 +82,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 
 # Django REST Framework
 REST_FRAMEWORK = {
+    'DEFAULT_SCHEMA_CLASS': 'drf_spectacular.openapi.AutoSchema',
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.TokenAuthentication',
         'rest_framework.authentication.SessionAuthentication',
@@ -89,4 +92,77 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
     'PAGE_SIZE': 20,
+
+    'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler',
+}
+
+# OpenAPI/Swagger Configuration
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Issue Tracker API',
+    'DESCRIPTION': '''
+    A full-featured issue tracking system API built with DRF.
+
+    ## Features
+    - User authentication with token-based auth
+    - Ticket CRUD operations
+    - Role-based permissions
+    - Status and priority tracking
+    - Assignment management
+
+     ## Authentication
+    Use Token Authentication by including the header:
+    `Authorization: Token <your-token>`
+    ''',
+
+    'VERSION': '1.0.0',
+    'SERVE_INCLUDE_SCHEMA': False,
+
+    'CONTACT': {
+        'name': 'Lameck',
+        'email': 'mugolameck@gmail.com',
+        'url': 'https://github.com/lameckirungu/django-issue-tracker',
+    },
+    'LICENSE': {
+        'name': 'MIT License',
+        'url': 'https://github.com/lameckirungu/django-issue-tracker/blob/main/LICENSE',
+    },
+        # Schema customization
+    'COMPONENT_SPLIT_REQUEST': True,
+    'SCHEMA_PATH_PREFIX': r'/api/v[0-9]',
+    
+    # Swagger UI configuration
+    'SWAGGER_UI_SETTINGS': {
+        'deepLinking': True,
+        'persistAuthorization': True,
+        'displayOperationId': True,
+        'filter': True,  # Adds search filter
+        'tryItOutEnabled': True,
+        'displayRequestDuration': True,
+    },
+    
+    # Security schemes
+    'APPEND_COMPONENTS': {
+        'securitySchemes': {
+            'Token': {
+                'type': 'apiKey',
+                'in': 'header',
+                'name': 'Authorization',
+                'description': 'Token-based authentication. Format: `Token <your-token>`'
+            },
+        }
+    },
+    'SECURITY': [{'Token': []}],
+    
+    # Sidecar for offline Swagger UI
+    'SWAGGER_UI_DIST': 'SIDECAR',
+    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
+    'REDOC_DIST': 'SIDECAR',
+    
+    # API versioning
+    'SERVE_URLCONF': None,
+    'TAGS': [
+        {'name': 'Authentication', 'description': 'User authentication and registration'},
+        {'name': 'Tickets', 'description': 'Ticket management operations'},
+        {'name': 'Users', 'description': 'User profile management'},
+    ],
 }
