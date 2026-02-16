@@ -1,3 +1,44 @@
 from django.db import models
+from django.conf import settings
 
-# Create your models here.
+
+class Ticket(models.Model):
+    """   
+    Core ticket model for issue tracking
+    """
+    STATUS_CHOICES = [
+        ('open', 'OPEN'),
+        ('in_progress', 'iN Progress'),
+        ('resolved', 'Resolved'),
+        ('closed', 'Closed'),
+    ]
+
+    PRIORITY_CHOICES = [
+        ('high', 'HIGH'),
+        ('medium', 'Medium'),
+        ('low', 'LOW'),
+        ('critical', 'Critical'),
+    ]
+
+    title = models.CharField(max_length=200)
+    description = models.TextField()
+    status = models.CharField(max_length=20, choices=STATUS_CHOICES, default='open')
+    created_by = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='created_tickets')
+    assigned_to = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.SET_NULL, null=True, blank=True, related_name="assigned_tickets")
+    content = models.TextField()
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+    resolved_at = models.DateTimeField(null=True, blank=True)
+    priority = models.CharField(max_length=20, choices=PRIORITY_CHOICES, default='medium')
+
+    class Meta:
+        db_table = 'tickets'
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['status', 'priority']),
+            models.Index(fields=['created_by']),
+            models.Index(fields=['assigned_to']),
+        ]
+
+    def __str__(self):
+        return f"#{self.pk} - {self.title}"

@@ -7,10 +7,10 @@ class UserAdmin(BaseUserAdmin):
     list_display = ['username', 'email', 'role', 'is_staff', 'date_joined']
     list_filter = ['role', 'is_staff', 'is_active']
 
-    fieldsets = BaseUserAdmin.fieldsets + (
+    fieldsets = list(BaseUserAdmin.fieldsets) + [
         ('Additional Info', {'fields': ('role', 'avatar')}),
-    )
+    ]
     
-    add_fieldsets = BaseUserAdmin.add_fieldsets + (
+    add_fieldsets = list(BaseUserAdmin.add_fieldsets) + [
         ('Additional Info', {'fields': ('role', 'avatar')}),
-    )
+    ]
