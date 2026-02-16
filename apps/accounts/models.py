@@ -11,7 +11,6 @@ class User(AbstractUser):
         ('user', 'Regular User'),
     ]
 
-    id = models.UUIDField(primary_key=True, editable=False, auto_created=True)
     role = models.CharField(
         max_length=20,
         choices=ROLES_CHOICES,
