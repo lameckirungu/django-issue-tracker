@@ -6,7 +6,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-placeholder-change-in-production')
 DEBUG = config('DEBUG', default=True, cast=bool)
-ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+
+# ALLOWED_HOSTS - include Railway domains and custom domains
+allowed_hosts = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+# Add Railway domains
+allowed_hosts.extend(['.up.railway.app', '.railway.app'])
+ALLOWED_HOSTS = [h.strip() for h in allowed_hosts]
 
 # Application definition
 INSTALLED_APPS = [
