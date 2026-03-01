@@ -1,5 +1,4 @@
 from rest_framework import serializers
-from django.contrib.auth import get_user_model
 from rest_framework.authtoken.models import Token
 
 from .models import User
@@ -30,16 +29,16 @@ class UserRegistrationSerializer(serializers.ModelSerializer):
         model = User
         fields = ['username', 'email', 'password', 'password_confirm', 'first_name', 'last_name']
 
-        def validate(self, attrs):
-            if attrs['password'] != attrs['password_confirm']:
-                raise serializers.ValidationError({"password": "Passwords don't match"})
-            return attrs
-        
-        def create(self, validated_data):
-            validated_data.pop('password_confirm')
-            user = User.objects.create_user(**validated_data)
-            Token.objects.create(user=user)
-            return user
+    def validate(self, attrs):
+        if attrs['password'] != attrs['password_confirm']:
+            raise serializers.ValidationError({"password": "Passwords don't match"})
+        return attrs
+
+    def create(self, validated_data):
+        validated_data.pop('password_confirm')
+        user = User.objects.create_user(**validated_data)
+        Token.objects.get_or_create(user=user)
+        return user
 
 class LoginSerializer(serializers.Serializer):
     """Login serializer"""

@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from drf_spectacular.utils import extend_schema, extend_schema_view, OpenApiParameter, OpenApiExample
 from drf_spectacular.types import OpenApiTypes
 from django.conf import settings
+from django.db import models
 
 
 from .serializers import TicketSerializer, TicketUpdateSerializer, TicketCreateSerializer
@@ -101,7 +102,7 @@ class TicketsViewset(viewsets.ModelViewSet):
             queryset = queryset.filter(status=status)
 
         # Filter by priority
-        priority = self.query_params.get('priority')
+        priority = self.request.query_params.get('priority')
         if priority:
             queryset = queryset.filter(priority=priority)
         
