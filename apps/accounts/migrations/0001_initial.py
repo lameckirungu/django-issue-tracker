@@ -22,11 +22,11 @@ class Migration(migrations.Migration):
             fields=[
                 (
                     "id",
-                    models.UUIDField(
+                    models.BigAutoField(
                         auto_created=True,
-                        editable=False,
                         primary_key=True,
                         serialize=False,
+                        verbose_name="ID",
                     ),
                 ),
                 ("password", models.CharField(max_length=128, verbose_name="password")),
