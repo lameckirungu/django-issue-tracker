@@ -33,13 +33,18 @@ This is a learning project to build a full-featured ticketing system with:
 
 | Method | Endpoint | Description |
 | :--- | :--- | :--- |
-| `GET`| `/api/tickets/` | List all tickets |
-| `POST`| `/api/tickets/` | Create a new tickets |
-| `GET`| `/api/tickets/{id}` | Retrieve a specific ticket |
-| `PUT`/`PATCH`| `/api/tickets/{id}` | Update a specific ticket |
-| `DELETE`| `/api/tickets/{id}` | Delete a specific ticket |
-`POST` | `/api/auth/login/` | User login (API token) |
-| `POST` | `/api/auth/logout/` | User logout (API token) |
+| `GET` | `/` | Redirect to Swagger docs (`/api/docs/`) |
+| `GET` | `/api/docs/` | Interactive API docs |
+| `GET` | `/api/redoc/` | ReDoc API docs |
+| `GET` | `/api/schema/` | OpenAPI schema |
+| `GET` | `/api/v1/tickets/` | List all tickets (auth required) |
+| `POST` | `/api/v1/tickets/` | Create a new ticket (auth required) |
+| `GET` | `/api/v1/tickets/{id}/` | Retrieve a specific ticket (auth required) |
+| `PUT`/`PATCH` | `/api/v1/tickets/{id}/` | Update a specific ticket (auth required) |
+| `DELETE` | `/api/v1/tickets/{id}/` | Delete a specific ticket (auth required) |
+| `POST` | `/api/v1/auth/register/` | User registration |
+| `POST` | `/api/v1/auth/login/` | User login (API token) |
+| `POST` | `/api/v1/auth/logout/` | User logout (API token) |
 
 
 ## Project Structure
