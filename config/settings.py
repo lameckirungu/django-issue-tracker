@@ -5,13 +5,33 @@ import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 SECRET_KEY = config('SECRET_KEY', default='django-insecure-placeholder-change-in-production')
-DEBUG = config('DEBUG', default=True, cast=bool)
+
+
+def env_bool(name, default=False):
+    value = config(name, default=str(default))
+    if isinstance(value, bool):
+        return value
+    normalized = str(value).strip().lower()
+    if normalized in {'1', 'true', 'yes', 'on'}:
+        return True
+    if normalized in {'0', 'false', 'no', 'off', ''}:
+        return False
+    return default
+
+
+def env_list(name, default=''):
+    raw = config(name, default=default)
+    return [item.strip() for item in str(raw).split(',') if item.strip()]
+
+
+DEBUG = env_bool('DEBUG', default=False)
 
 # ALLOWED_HOSTS - include Railway domains and custom domains
-allowed_hosts = config('ALLOWED_HOSTS', default='localhost,127.0.0.1').split(',')
+allowed_hosts = env_list('ALLOWED_HOSTS', default='localhost,127.0.0.1')
 # Add Railway domains
 allowed_hosts.extend(['.up.railway.app', '.railway.app'])
 ALLOWED_HOSTS = [h.strip() for h in allowed_hosts]
+CSRF_TRUSTED_ORIGINS = env_list('CSRF_TRUSTED_ORIGINS', default='')
 
 # Application definition
 INSTALLED_APPS = [
@@ -65,11 +85,13 @@ TEMPLATES = [
 
 # Custom User Model
 AUTH_USER_MODEL = 'accounts.User'
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 # Database
-if config('DATABASE_URL', default=None):
+database_url = config('DATABASE_URL', default=None)
+if database_url:
     DATABASES = {
-        'default': dj_database_url.config()
+        'default': dj_database_url.parse(database_url, conn_max_age=600)
     }
 else:
     DATABASES = {
@@ -82,6 +104,14 @@ else:
             'PORT': config('DB_PORT', default=''),
         }
     }
+
+# Proxy/SSL settings - safe defaults for direct EC2 demo deployment.
+USE_X_FORWARDED_HOST = env_bool('USE_X_FORWARDED_HOST', default=False)
+if env_bool('USE_PROXY_SSL_HEADER', default=False):
+    SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
+SECURE_SSL_REDIRECT = env_bool('SECURE_SSL_REDIRECT', default=False)
+SESSION_COOKIE_SECURE = env_bool('SESSION_COOKIE_SECURE', default=False)
+CSRF_COOKIE_SECURE = env_bool('CSRF_COOKIE_SECURE', default=False)
 
 # Static files
 STATIC_URL = '/static/'
@@ -170,10 +200,19 @@ SPECTACULAR_SETTINGS = {
     },
     'SECURITY': [{'Token': []}],
     
-    # Sidecar for offline Swagger UI
-    'SWAGGER_UI_DIST': 'SIDECAR',
-    'SWAGGER_UI_FAVICON_HREF': 'SIDECAR',
-    'REDOC_DIST': 'SIDECAR',
+    # CDN docs assets to avoid static manifest/runtime coupling.
+    'SWAGGER_UI_DIST': config(
+        'SWAGGER_UI_DIST',
+        default='https://cdn.jsdelivr.net/npm/swagger-ui-dist@5',
+    ),
+    'SWAGGER_UI_FAVICON_HREF': config(
+        'SWAGGER_UI_FAVICON_HREF',
+        default='https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/favicon-32x32.png',
+    ),
+    'REDOC_DIST': config(
+        'REDOC_DIST',
+        default='https://cdn.jsdelivr.net/npm/redoc@next/bundles/redoc.standalone.js',
+    ),
     
     # API versioning
     'SERVE_URLCONF': None,
